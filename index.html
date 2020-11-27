@@ -1,0 +1,699 @@
+<html>
+<meta charset="UTF-8">
+<meta property="og:title" content="Quiz Eleição POA 2020: compare as propostas"/>
+<meta property="og:description" content="Compare as propostas das chapas que concorrem ao segundo turno das eleições de Porto Alegre com as suas ideias!"/>
+<meta property="og:image" content="https://hisham.hm/poa2020/urna.jpg"/>
+<head>
+
+<style>
+/* Intro */
+
+body {
+   font-size: 16px;
+}
+
+body.touch {
+   font-size: 200%;
+}
+
+* {
+   font-family: sans;
+}
+
+#intro {
+   display: flex;
+   flex-flow: column;
+   justify-content: center;
+   align-items: center;
+   width: 100%;
+}
+
+#intro-title {
+   text-align: center;
+   font-size: 150%;
+   font-weight: bold;
+   padding-top: 2em;
+   padding-bottom: 0.5em;
+}
+
+#intro-text {
+   width: 30em;
+   text-align: center;
+   padding: 1em;
+}
+
+#intro-start, #results-reset {
+   padding: 1em;
+   font-size: 150%;
+   background-color: #77ffcc;
+}
+
+a {
+   color: #777777;
+}
+
+/* Quiz */
+
+#compare {
+   width: 100%;
+   display: none;
+   flex-flow: column;
+}
+
+.prop-title {
+   width: 100%;
+   text-align: center;
+   font-size: 150%;
+   font-weight: bold;
+   padding-top: 1em;
+   padding-bottom: 1em;
+}
+
+.props {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+}
+
+.prop {
+   width: 40%;
+   margin: 2em;
+   border: solid 1px #ffaa77;
+   cursor: pointer;
+   padding: 1em;
+   background-color: #ffffee;
+}
+
+body.touch .prop {
+   margin: 0px;
+}
+
+body.nontouch .prop:hover {
+   background-color: #ffff77;
+}
+
+/* Results screen */
+
+#results {
+   width: 100%;
+   display: none;
+   flex-flow: column;
+   justify-content: center;
+   align-items: center;
+}
+
+.results-pic {
+   width: 10em;
+   height: 10em;
+   display: none;
+}
+
+#results-title {
+   width: 100%;
+   text-align: center;
+   font-size: 150%;
+   font-weight: bold;
+   padding-top: 1em;
+   padding-bottom: 1em;
+}
+
+#results-text {
+   text-align: center;
+   padding: 1em;
+}
+
+/* Props list in results screen */
+
+#all-props {
+   padding-top: 4em;
+   display: flex;
+   flex-flow: column;
+   justify-content: center;
+}
+
+.all-props-pair {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+}
+
+.all-props-pair-title {
+   width: 100%;
+   text-align: center;
+   font-size: 150%;
+   font-weight: bold;
+}
+
+.picked {
+   width: 40%;
+   font-size: 75%;
+   margin: 2em;
+   border: solid 1px #ffaa77;
+   padding: 1em;
+   background-color: #ffff77;
+}
+
+.not-picked {
+   width: 40%;
+   font-size: 75%;
+   margin: 2em;
+   border: solid 1px #ffaa77;
+   padding: 1em;
+   background-color: #ffffee;
+}
+
+body.touch .picked, body.touch .not-picked {
+   margin: 0px;
+}
+
+</style>
+
+<script>
+
+const intro = {
+   title: "Quiz Eleição POA 2020: compare as propostas",
+   text: "Compare as propostas das chapas que concorrem ao segundo turno\
+         das eleições de Porto Alegre com as suas ideias, num\
+         <b>&quot;quiz estilo Buzzfeed&quot;</b>!\
+         <br/><br/>\
+         Serão apresentados 9 temas, cada um com trechos extraídos\
+         da cobertura da imprensa e dos próprios planos de governo.\
+         Clique na que você concordar mais.\
+         A ordem dos tópicos e trechos são aleatorizados.\
+         Ao final, você poderá ver no resultado com qual chapa suas\
+         opiniões são mais alinhadas.\
+         <br/><br/>\
+         <i>O quiz roda todo no seu dispositivo sem se comunicar com\
+         o servidor; os resultados não são enviados ou armazenados\
+         para lugar algum. (O código está disponível\
+         <a href=\"https://github.com/hishamhm/poa2020\">aqui</a>!)</i>",
+   start: "Começar!"
+};
+
+const names = [ "Manuela", "Melo" ];
+
+const props = [
+   [ "Concursos públicos e valorização dos servidores",
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "Pretende valorizar o quadro funcional da prefeitura, envolvendo-os na gestão e na execução \
+     dos serviços que tanto impactam a vida da população.\
+     Honrar os salários dos servidores públicos municipais será prioridade:\
+     &quot;Pagar os servidores é uma forma de honrar o trabalho dessas pessoas\
+     e movimentar a economia&quot;\
+     <br/><br/>\
+     Vai ofertar um regime para a complementação do quadro de 40 horas. Além\
+     disso, vai realizar a contratação emergencial de 30% do quadro de\
+     professores e monitores escolares.",
+
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "Para que Porto Alegre possa alavancar e enfrentar os desafios, será necessário\
+     investimento público. No seu plano de governo, menciona o papel dos servidores\
+     públicos na recuperação da cidade e reforça a necessidade do diálogo.\
+     <br/><br/>\
+     &quot;O futuro governo terá que utilizar todo o seu talento político e de gestão para\
+     conduzir o processo de recuperação da cidade, bem como para construir seu futuro,\
+     dialogando com a população, os agentes econômicos e os servidores para que a cidade prospere&quot;" ],
+
+   [ "Educação",
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "Investir na formação continuada dos professores e profissionais da\
+     educação, além de incentivar uma política colaborativas de boas práticas\
+     pedagógicas e elevar o desempenho da rede municipal no Índice de\
+     Desenvolvimento da Educação Básica (IDEB). Sobre a educação infantil, para\
+     garantir vagas públicas, o plano é expandir a rede da cidade com uma nova\
+     política de convênio emergencial, universalizando a cobertura para pré-escola\
+     (crianças de quatro a cinco anos) e aumentando para 50% a cobertura de creches\
+     (até três anos).\
+     <br/><br/>\
+     Na Educação de Jovens e Adultos (EJA), reabrir turmas de alfabetização como\
+     forma de enfrentar o analfabetismo na cidade, além de fortalecer as ações de\
+     inclusão na EJA. Ela também garante alcançar mil pontos de acesso livre à\
+     internet em Porto Alegre.",
+
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "Ampliar o atendimento da educação infantil, capacitar continuamente os professores,\
+     incrementar o número de creches e vagas correspondentes.\
+     Novos modelos devem ser analisados, incluindo a possibilidade de que cada escola \
+     tenha a sua própria meta do Índice de Desenvolvimento da Educação Básica (IDEB). \
+     <br/><br/> \
+     Buscar escolas cívico-militares com iniciativas pedagógicas relevantes e \
+     expandir a experiência com entidades conveniadas, que permitem que o serviço \
+     público de educação seja prestado de forma não-estatal.\
+     <br/><br/>\
+     Em relação à infraestrutura, deseja investir em internet de qualidade e com alta \
+     velocidade para as escolas municipais, onde pode ser possível estabelecer \
+     parceria com a Rede Nacional de Pesquisa (RNP)." ],
+
+   [ "Empregabilidade",
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "Retomada de obras públicas. Além disso, fomentar a economia solidária e\
+     microcrédito através das cooperativas de mulheres nos bairros da cidade,\
+     a fim de gerar empregos e renda.\
+     <br/><br/>\
+     Outra proposta é a criação de uma programa de\
+     geração de renda e oportunidades para pequenos empreendedores e jovens da\
+     capital gaúcha. Tranversalizar as políticas de\
+     empregabilidade para grupos em vulnerabilidade socioeconômica.",
+
+     // https://folhadirigida.com.br/concursos/noticias/eleicoes-2020/eleicoes-2020-porto-alegre-rs
+     "O turismo será um dos focos de atenção, através de investimento na área\
+     e buscando alternativas para a que a cidade tenha um\
+     centro de eventos.\
+     <br/><br/>\
+     Para a geração de empregos, frisa a importância da inovação e cita o &quot;imenso\
+     estoque de conhecimento e talentos desenvolvido pelo esquema virtuoso das\
+     universidades&quot;, como os polos de tecnologia da PUCRS e UFRGS, por exemplo." ],
+
+   [ "Empreendedorismo",
+     // https://manuela.poa.br/proposta/aportoalegrequequeremos/
+     "Criar a Sala do Investidor: Estará orientada para acompanhar e agilizar \
+     a tramitação das demandas burocráticas  junto à prefeitura, promovendo \
+     parcerias, apoiando a qualificação dos empreendedores  e simplificando o \
+     licenciamento de novos empreendimentos.  \
+     <br/><br/> \
+     Dados para Empreender: Adoção de política pública para mineração de \
+     dados, problemas e estimativa de  soluções, colocando-os à disposição dos \
+     empreendimentos e redes de produção e  consumo. Nosso foco será reforçar o \
+     comércio de bairro, observando especificidades de  renda, negócios \
+     concorrentes e fornecedores, prestadores de serviços e logística.  \
+     <br/><br/> \
+     Constituir a Plataforma de Pequenos Serviços de POA (ServPOA), um \
+     aplicativo local,  que auxilie na intermediação de trabalhadores \
+     autônomos e contribua com a  transformação digital de pequenos negócios e \
+     microempreendedores.",
+
+     // https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf
+     "Vamos  regulamentar  a  Lei  de  Liberdade  Econômica  em  Porto Alegre, \
+     simplificando  procedimentos  e  diminuindo  burocracia.  Queremos  que  \
+     Porto Alegre deixe de ser um ambiente hostil ao empreendedorismo. Os pequenos \
+     negócios, de baixo risco, ficarão dispensados de qualquer tipo de licença \
+     emitida pela Prefeitura, permitindo que a atenção do poder público se \
+     concentre nos projetos de médio e alto risco, acelerando sua análise. Os \
+     pedidos de licença que não forem cumpridos no prazo dado pela Prefeitura serão \
+     tidos como concedidos. \
+     <br/><br/> \
+     Vamos reunir, na Sala do Empreendedor, não apenas  as  funções \
+     burocráticas  da  Prefeitura,  mas  um  ecossistema  de  serviçosde \
+     fomento  ao  empreendedorismo,  tais  como  micro  crédito,  qualificação  \
+     profissional  e apoio aos empreendedores. \
+     <br/><br/> \
+     Não   haverá   aumento   de   impostos. A estratégia  para  o  aumento  \
+     da  arrecadação  sem  aumento  de impostos será a ampliação da base \
+     econômica da cidade pela melhoria do ambiente de negócios,   assim   como   \
+     pelo   estímulo   ao   desenvolvimento   de   polos   econômicos \
+     descentralizados no território do município. " ],
+
+   [ "Quarto Distrito",
+     // https://manuela.poa.br/proposta/aportoalegrequequeremos/
+     "Tornar o Quarto Distrito um polo pujante na renovação do \
+     ciclo  econômico da cidade, qualificando os serviços públicos da região, \
+     valorizando, incluindo e  articulando as diferentes comunidades e atividades \
+     existentes já naquele território. \
+     <br/><br/> \
+     Adotar medidas de qualificação urbana que valorizem a região, com intervenções \
+     de  iluminação, paisagísticas e limpeza urbana em toda sua área;  \
+     <br/><br/> \
+     Criar mecanismos para o fomento de um hub de tecnologia, inovação e economia  \
+     criativa, a partir da valorização dos clusters preexistentes (Vila Flores, \
+     Distrito C,  Fábrica do Futuro, entre outros);  \
+     <br/><br/> \
+     Criar o Circuito Cênico – constituição de uma galeria a céu aberto, com \
+     exposições e  pinturas de murais nos prédios do Quarto Distrito, fortalecendo \
+     um novo um percurso  cultural, articulado com a Bienal do Mercosul, agenda \
+     cultural, bares, cervejarias,  empresas de economia criativa, comércio de \
+     iluminação entre outros;  \
+     <br/><br/> \
+     Promoção e fortalecimento do Polo Cervejeiro – Promoveremos Porto Alegre como  \
+     capital nacional de cerveja artesanal, e apoiaremos a formação de parcerias \
+     com  instituições de ensino para a constituição de uma escola de cervejaria.  \
+     <br/><br/> \
+     Fortalecimento dos núcleos de habitação social da região e mapeamento para  \
+     utilização de imóveis públicos municipais (terrenos e/ou edifícios) ociosos \
+     para  ampliação de política de habitação de interesse social na região;  \
+     <br/><br/> \
+     Fábricas e Casas da Criação, fomento de Parcerias Público-Comunitárias para  \
+     destinar casas e galpões ociosos para a Economia Criativa, do conhecimento, \
+     projetos  de artes visuais, artes cênicas, circenses, música, coworking, \
+     feiras e multimídia, nos  moldes da experiência de Barcelona e do Porto \
+     Digital em Recife;  \
+     <br/><br/> \
+     Constituir uma mesa de diálogo entre empresas da região, empreendedores e \
+     ativistas  urbanos, as universidades e a Prefeitura, valorizando projetos \
+     urbanos do Quarto  Distrito já existentes.",
+
+     // https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf
+     "Vamos trabalhar para destinar recursos - sem aumento de impostos – e  apoiar  e \
+     fomentar  a  ocupação do  Quarto  Distrito por empresas e  habitação. \
+     <br/><br/> \
+     Vamos estimular  a  atividade  econômica  nesse  território  de  maneira  a  \
+     fomentar  a  nossa reconhecida  indústria  criativa.  \
+     <br/><br/> \
+     Vamos construir  políticas para  estimular  a  ocupação urbana conectando a rentabilização e otimização \
+     do uso do solo urbano com projetos comerciais  e  residenciais  nesse  polo  \
+     latente  e  aberto  ao  novo.\
+     <br/><br/>\
+     Vamos  propor  a possibilidade  de  adensamento  \
+     na  região,  permitindo  o  melhor  uso  do  solo  e  a concentração  de  \
+     pessoas  e  negócios,  com  a  otimização  da  infraestrutura  pública  lá \
+     existente." ],
+
+   [ "Licenciamento",
+     // https://manuela.poa.br/proposta/aportoalegrequequeremos/
+     "Política de Regularização Fundiária com Urbanização: implementar Escritórios  \
+     Distritais de Licenciamento e Regularização Fundiária para ampliar e facilitar \
+     os  procedimentos de regularização;  \
+     <br/><br/> \
+     Promover políticas direcionadas aos produtores rurais que facilitem o \
+     licenciamento, transporte e comercialização da produção agrícola do município.",
+
+     // https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf
+     "Auto  licenciamento -  Vamos  investir  no fortalecimento  da cultura  da \
+     confiança  entre  a  máquina  pública,  o  cidadão  e  os  empreendedores. \
+     Para obras  pequenas,  o  cidadão  toma  todas  as  medidas  para  realizar \
+     o  projeto  e  informa estes procedimentos à Prefeitura, que acolherá a presunção \
+     da verdade na palavra do cidadão, punindo-se  apenas  os  casos  em  que  houver \
+     declarações  falsas  ao  poder público. A Prefeitura confia, o cidadão faz. \
+     <br/><br/>\
+     Viabilizar uma nova lei que autorize o credenciamento de empresas \
+     especializadas para avaliar projetos de maior porte, entregando-os já \
+     estruturados para receber o selo final de  aprovação  da  prefeitura.  Essas  \
+     empresas  serão  uma  espécie  de  certificadoras  da adequação técnica de \
+     cada  projeto.    Se falharem  nessa tarefa  serão  descredenciadas. \
+     <br/><br/>\
+     Centralizar todas as etapas envolvidas, para emitir uma única guia de licenciamento,\
+     num  único  local  físico. Ao  unificar geográfica e  procedimentalmente o \
+     atendimento  ao  cidadão  facilitamos  sua  vida e economizamos o  seu precioso tempo,\
+     além de agilizar a análise para emissão das licenças" ],
+
+   [ "Transporte",
+     // https://noticias.uol.com.br/eleicoes/2020/10/15/porto-alegre-so-4-dos-13-candidatos-propoem-atacar-preco-do-onibus.htm
+     "Propõe constituir um fundo municipal de mobilidade e a revisão no\
+     cálculo da passagem, dando transparência à forma como se chega à tarifa.\
+     Também promete novo modelo de gestão para a Carris, uma das empresas\
+     operadoras do transporte público na cidade.\
+     <br/><br/>\
+     Sugere a criação de um aplicativo\
+     de transporte com custo reduzido para o motorista e que possa contribuir com\
+     recursos para a formação de um fundo municipal de mobilidade.\
+     <br/><br/>\
+     Promete retomar o planejamento de investimentos em outros modais de transporte (BRTs, VLTs e\
+     hidroviário) e seguir com o plano cicloviário da cidade.",
+
+     // https://noticias.uol.com.br/eleicoes/2020/10/15/porto-alegre-so-4-dos-13-candidatos-propoem-atacar-preco-do-onibus.htm
+     "Quer repensar o modelo do sistema de transporte atual por meio do\
+     diálogo com os agentes do setor.\
+     <br/><br/>\
+     Compromete-se a avaliar as\
+     alternativas e ser transparente com os funcionários, empresários e usuários do\
+     sistema de transporte quanto ao método a ser implementado, bem como as etapas\
+     e custos de implementação.\
+     <br/><br/>\
+     Acredita no transporte hidroviário como alternativa\
+     de mobilidade e afirma que não serão implementados pedágios na cidade." ],
+
+   [ "Segurança",
+     // https://manuela.poa.br/proposta/aportoalegrequequeremos/
+     "Fortalecer o Gabinete de Gestão Integrada Municipal, com o objetivo de\
+     integrar as  ações dos vários atores públicos nesta área (municipal,\
+     estadual e federal) e sincronizar  as intervenções de prevenção social e\
+     comunitária com atividades de polícia e justiça,  bem como, estabelecer\
+     processo de interação com a participação social; \
+     <br/><br/>\
+     Implantar as Áreas Integradas de Segurança Pública – AISP, de acordo com\
+     divisão  geográfica do Orçamento Participativo, articulando com o Governo\
+     do Estado,  Ministério Público e Poder Judiciário, de forma a coincidir a\
+     atuação e a  responsabilidade de gestão dos serviços municipais, de justiça e\
+     de polícia, assim garantindo as identidades das comunidades destas regiões,\
+     integrando com os serviços e  ações da Prefeitura; \
+     <br/><br/>\
+     Ação pontual, o Presídio: Porto Alegre é sede do pior presídio do país e\
+     um dos  principais centros de recrutamento da juventude gaúcha às\
+     organizações criminosas.  Entendemos que é necessária uma ação entre\
+     Prefeitura, Governo do Estado, poder  judiciário, para mudarmos a realidade\
+     atual; \
+     <br/><br/>\
+     O papel da Guarda Municipal: Regulamentar em Porto Alegre o Estatuto\
+     Geral da Guarda Municipal, com foco comunitário e preventivo, atuando\
+     nos territórios para a  promoção da segurança, da preservação do patrimônio\
+     público, para a proteção  sistêmica da população que utiliza os bens, serviços\
+     e instalações municipais; colaborar,  de forma integrada com os órgãos de\
+     segurança pública, em ações conjuntas que  contribuam com a convivência e o\
+     bem viver.",
+
+     // https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf
+     "Segurança está entre as prioridades da agenda pública que estamos propondo para\
+     Porto Alegre e as políticas propostas estão orientadas pelos conceitos \
+     de planejamento, território, inteligência e integração. Vamos buscar\
+     integração da Guarda Municipal com a Brigada Militar e outros órgãos de \
+     segurança estaduais e federais, e aprofundar o uso da tecnologia no \
+     combate à criminalidade.\
+     <br/><br/>\
+     Mas segurança não é apenas polícia na rua. Contempla o fortalecimento do\
+     vínculo familiar, educação de qualidade, melhoria dos espaços públicos,\
+     oferta de cultura, iluminação, emprego e renda, combate à drogadição." ],
+
+   [ "Mercado Público", 
+     // https://www.sul21.com.br/ultimas-noticias/politica/eleicoes-2020/2020/10/conheca-as-propostas-dos-candidatos-a-prefeitura-de-porto-alegre-para-o-futuro-do-mercado-publico/
+     "Com a participação dos mercadeiros e da comunidade, vamos revitalizar o\
+     Mercado.  Preservando patrimônio material e imaterial com a manutenção da\
+     gestão pública do espaço e usando recursos do FunMercado para sua recuperação.\
+     Não vamos aumentar aluguéis nem excluiremos ninguém e vamos garantir o Mercado\
+     com um espaço de abastecimento popular e diferenciado. Temos diálogo\
+     permanente com a associação do mercado e acreditamos na gestão com diálogo.",
+
+     // https://www.sul21.com.br/ultimas-noticias/politica/eleicoes-2020/2020/10/conheca-as-propostas-dos-candidatos-a-prefeitura-de-porto-alegre-para-o-futuro-do-mercado-publico/
+     "Vou fazer uma parceria e entregar a gestão do Mercado para os 110\
+     permissionários, através da Associação dos Permissionários. Com a\
+     seguinte condição: eles devem terminar as obras do andar superior, que está em\
+     torno de R$ 10 milhões, e isso talvez nós podemos compensar com a prorrogação\
+     das permissões, e também com a abertura do Mercado aos domingos, no que diz\
+     respeito a gastronomia, restaurantes, e talvez a experiência de algumas bancas\
+     centrais, para dar vida à cidade no centro.\
+     <br/><br/>\
+     Vamos terminar as obras do Mercado, pintura, troca de redes de esgoto,\
+     a questão do gás, tudo isso envolve cerca\
+     de R$ 10 milhões. A minha parceria será com os permissionários." ]
+];
+
+const resultData = [
+   {
+      title: "Resultado: Manuela D'Ávila",
+      // https://twitter.com/ManuelaDavila
+      image: "manuela.jpg",
+      description: "\
+         Suas escolhas estão mais alinhadas às propostas da<br/>\
+         candidata <b>Manuela D'Ávila</b>, número <b>65</b>.\
+         <br/><br/>\
+         Confira abaixo a lista completa do quiz.<br/>\
+         Os planos de governo completos das duas chapas estão\
+         disponíveis online:<br/>\
+         <a target=\"_blank\" href=\"https://manuela.poa.br/proposta/aportoalegrequequeremos/\">plano da Manuela</a> e\
+         <a target=\"_blank\" href=\"https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf\">plano do Melo</a>.\
+      ",
+   },
+   {
+      title: "Resultado: Sebastião Melo",
+      // https://twitter.com/SebastiaoMelo
+      image: "melo.jpg",
+      description: "\
+         Suas escolhas estão mais alinhadas às propostas do<br/>\
+         candidato <b>Sebastião Melo</b>, número <b>15</b>.\
+         <br/><br/>\
+         Confira abaixo a lista completa do quiz.<br/>\
+         Os planos de governo completos das duas chapas estão\
+         disponíveis online:<br/>\
+         <a target=\"_blank\" href=\"https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2020/RS/88013/426/candidatos/381903/5_1600395656527.pdf\">plano do Melo</a> e\
+         <a target=\"_blank\" href=\"https://manuela.poa.br/proposta/aportoalegrequequeremos/\">plano da Manuela</a>.\
+      ",
+   }
+];
+
+const resultsButtonText = "Reiniciar!";
+
+</script>
+
+</head>
+
+<body>
+
+<div id="intro">
+   <div class="intro-title" id="intro-title">
+   </div>
+   <div class="intro-text" id="intro-text">
+   </div>
+   <button id="intro-start"/></button>
+</div>
+
+<div id="compare">
+   <div class="prop-title" id="prop-title">
+   </div>
+   <div class="props">
+      <div class="prop" id="prop-left">
+      </div>
+      <div class="prop" id="prop-right">
+      </div>
+   </div>
+</div>
+
+<div id="results">
+   <div id="results-title">
+   </div>
+   <img class="results-pic" id="results-pic-1"/>
+   <img class="results-pic" id="results-pic-2"/>
+   <div id="results-text">
+   </div>
+   <div id="all-props">
+   </div>
+   <button id="results-reset"/></button>
+</div>
+
+<script>
+let curProp = -1;
+let picks1 = 0;
+let picks2 = 0;
+let pending = [];
+let myPicks = [];
+let answers = 0;
+
+let introDiv = document.getElementById("intro");
+let introTitle = document.getElementById("intro-title");
+let introText = document.getElementById("intro-text");
+let introStart = document.getElementById("intro-start");
+
+let compare = document.getElementById("compare");
+let propTitle = document.getElementById("prop-title");
+let propLeft = document.getElementById("prop-left");
+let propRight = document.getElementById("prop-right");
+
+let results = document.getElementById("results");
+let resultsTitle = document.getElementById("results-title");
+let resultsText = document.getElementById("results-text");
+let resultsPic1 = document.getElementById("results-pic-1");
+let resultsPic2 = document.getElementById("results-pic-2");
+let resultsReset = document.getElementById("results-reset");
+let allProps = document.getElementById("all-props");
+
+let resultsPre1 = document.getElementById("results-pre-1");
+let resultsPre2 = document.getElementById("results-pre-2");
+
+resultsPic1.src = resultData[0].image;
+resultsPic2.src = resultData[1].image;
+
+function resetProps() {
+   curProp = -1;
+   picks1 = 0;
+   picks2 = 0;
+   answers = 0;
+   pending = Array.from({length: props.length}, (x, i) => i);
+   myPicks = [];
+
+   compare.style.display = "none";
+   results.style.display = "none";
+}
+
+function showResults() {
+   compare.style.display = "none";
+
+   let pick = (picks1 > picks2) ? 0 : 1;
+   let notPick = (pick == 0) ? 1 : 0;
+   let data = resultData[pick]
+
+   resultsReset.innerHTML = resultsButtonText;
+   resultsReset.onclick = function() { 
+      resetProps();
+      pickProp();
+   }
+
+   resultsTitle.innerHTML = data.title;
+   resultsText.innerHTML = data.description;
+   
+   while (allProps.firstChild) {
+      allProps.removeChild(allProps.firstChild);
+   }
+   
+   for (let i in props) {
+      const p = props[i];
+
+      let pair = document.createElement("div");
+      pair.className = "all-props-pair";
+      allProps.appendChild(pair);
+
+      let pairTitle = document.createElement("div");
+      pairTitle.className = "all-props-pair-title";
+      pairTitle.innerHTML = p[0];
+      pair.appendChild(pairTitle);
+
+      let propsDiv = document.createElement("div");
+      propsDiv.className = "props";
+      pair.appendChild(propsDiv);
+
+      let left = document.createElement("div");
+      left.innerHTML = "<b>" + names[pick] + "</b>: " + p[pick + 1];
+      left.className = (myPicks[i] == pick) ? "picked" : "not-picked";
+      propsDiv.appendChild(left);
+
+      let right = document.createElement("div");
+      right.innerHTML = "<b>" + names[notPick] + "</b>: " + p[notPick + 1];
+      right.className = (myPicks[i] != pick) ? "picked" : "not-picked";
+      propsDiv.appendChild(right);
+   }
+   
+   resultsPic1.style.display = (pick == 0) ? "flex" : "none";
+   resultsPic2.style.display = (pick == 0) ? "none" : "flex";
+
+   results.style.display = "flex"
+}
+
+function pickProp() {
+   if (pending.length == 0) {
+      showResults();
+      return;
+   }
+   
+   answers++;
+
+   let pos = Math.floor(Math.random() * pending.length);
+   let picks = pending.splice(pos, 1);
+   let curProp = picks[0];
+   
+   propTitle.innerHTML = answers + "/" + props.length + ": " + props[curProp][0];
+   
+   let coin = Math.random() >= 0.5;
+   let propA = coin == 0 ? propLeft : propRight;
+   let propB = coin == 0 ? propRight : propLeft;
+   
+   propA.innerHTML = props[curProp][1];
+   propB.innerHTML = props[curProp][2];
+   propA.onclick = function() {
+      picks1++;
+      myPicks[curProp] = 0;
+      return pickProp();
+   }
+   propB.onclick = function() {
+      picks2++;
+      myPicks[curProp] = 1;
+      return pickProp();
+   }
+
+   compare.style.display = "flex";
+}
+
+resetProps();
+
+introTitle.innerHTML = intro.title;
+introText.innerHTML = intro.text;
+introStart.innerHTML = intro.start;
+introStart.onclick = function() {
+   introDiv.style.display = "none";
+   pickProp();
+}
+
+if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+   document.body.className = "touch";
+} else {
+   document.body.className = "nontouch";
+}
+</script>
+
+</body>
+</html>
