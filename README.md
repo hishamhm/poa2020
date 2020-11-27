@@ -3,6 +3,8 @@
 Compare as propostas das chapas que concorrem ao segundo turno das eleições de
 Porto Alegre com as suas ideias, num "quiz estilo Buzzfeed"! 
 
+* [Acesse o quiz!](https://hisham.hm/poa2020)
+
 ## Fontes
 
 O código-fonte inteiro está dentro do `index.html`, includindo o HTML,
